@@ -8,6 +8,18 @@ xhr.onreadystatechange = function() {
   if (xhr.readyState === DONE) {
     if (xhr.status === OK) {
       console.log(xhr.responseText); // 'This is the returned text.'
+      var projects = JSON.parse(xhr.responseText);
+      projects.forEach(function(project){
+        var name = document.createElement('a');
+        name.innerHTML = project.name;
+        name.href = "/projects/" + project.id;
+        document.body.appendChild(name);
+        project.onClick = function(event) {
+          event.preventDefault();
+          alert("Load using Ajax");
+        }
+      });
+
     } else {
       console.log('Error: ' + xhr.status); // An error occurred during the request.
     }

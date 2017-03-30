@@ -1,79 +1,27 @@
-/*
-function loadIndex() {
-  $.get('/projects', function(projects, status) {
-    if(status == 200) {
-      $('body').clear();
-      projects.forEach(function(project){
-        var link = $('a')
-          .text(project.name)
-          .attr('href', '/projects/' + project.id)
-          .on('click', function(e){
-            e.preventDefault();
-            loadProject('/projects/' + project.id);
-          });
-        $('body').append(link);
-      });
-    }
+(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+/* Main entry point */
+
+var project = require('./project');
+
+$.get('/projects', function(projects){
+  $('body').html(project.list(projects));
+});
+
+},{"./project":2}],2:[function(require,module,exports){
+module.exports = {
+  list
+};
+
+/* Given a list of projects, create a table */
+function list(projects){
+  var table = $('<table>').addClass('table');
+  var head = $('<tr>').append('<th>Name</th>').appendTo(table);
+  projects.forEach(function(project) {
+    var row = $('<tr>').append(
+      $('<td>').text(project.name)
+    ).appendTo(table);
   });
-}
-*/
-
-function loadIndex() {
-  var xhr = new XMLHttpRequest();
-  xhr.open('GET', '/projects/');
-  xhr.send(null);
-
-  xhr.onreadystatechange = function() {
-    var DONE = 4; // readyState 4 means the request is done.
-    var OK = 200; // status 200 is a successful return.
-    if (xhr.readyState === DONE) {
-      if (xhr.status === OK) {
-        console.log(xhr.responseText); // 'This is the returned text.'
-        var projects = JSON.parse(xhr.responseText);
-        projects.forEach(function(project){
-          var name = document.createElement('a');
-          name.innerHTML = project.name;
-          name.href = "/projects/" + project.id;
-          document.body.appendChild(name);
-          project.onClick = function(event) {
-            event.preventDefault();
-            loadProject("/projects/" + project.id);
-          }
-        });
-
-      } else {
-        console.log('Error: ' + xhr.status); // An error occurred during the request.
-      }
-    }
-  }
+  return table;
 }
 
-function loadProject(url) {
-  var xhr = new XMLHttpRequest();
-  xhr.open('GET', url);
-  xhr.send(null);
-
-  xhr.onreadystatechange = function() {
-    var DONE = 4; // readyState 4 means the request is done.
-    var OK = 200; // status 200 is a successful return.
-    if (xhr.readyState === DONE) {
-      if (xhr.status === OK) {
-        console.log(xhr.responseText); // 'This is the returned text.'
-        var project = JSON.parse(xhr.responseText);
-        var wrapper = document.createElement('div');
-        var name = document.createElement('h1');
-        var image = document.createElement('img');
-        name.innerHTML = project.name;
-        image.src = project.imageSrc;
-        wrapper.appendChild(name);
-        wrapper.appendChild(image);
-        document.body.
-        document.body.appendChild(wrapper);
-      } else {
-        console.log('Error: ' + xhr.status); // An error occurred during the request.
-      }
-    }
-  }
-}
-
-loadIndex();
+},{}]},{},[1]);

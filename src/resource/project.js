@@ -12,6 +12,10 @@ module.exports = {
   destroy: destroy
 }
 
+var urlencoded = require("../../lib/form-urlencoded");
+
+var auth = require("./../../lib/auth-cookie.js");
+
 /** @function list
  * Sends a list of all projects as a JSON array.
  * @param {http.incomingRequest} req - the request object
@@ -19,14 +23,16 @@ module.exports = {
  * @param {sqlite3.Database} db - the database object
  */
 function list(req, res, db) {
-  db.all("SELECT * FROM projects", [], function(err, projects){
-    if(err) {
-      console.error(err);
-      res.statusCode = 500;
-      res.end("Server Error")
-    }
-    res.setHeader("Content-Type", "text/json");
-    res.end(JSON.stringify(projects));
+  auth(req, res, function(req, res){
+    db.all("SELECT * FROM projects", [], function(err, projects){
+      if(err) {
+        console.error(err);
+        res.statusCode = 500;
+        res.end("Server Error")
+      }
+      res.setHeader("Content-Type", "text/json");
+      res.end(JSON.stringify(projects));
+    });
   });
 }
 
@@ -37,20 +43,8 @@ function list(req, res, db) {
  * @param {sqlite3.Database} db - the database object
  */
 function create(req, res, db) {
-  var body = "";
-
-  req.on("error", function(err){
-    console.error(err);
-    res.statusCode = 500;
-    res.end("Server error");
-  });
-
-  req.on("data", function(data){
-    body += data;
-  });
-
-  req.on("end", function() {
-    var project = JSON.parse(body);
+  urlencoded(req, res, (req, res) => {
+    var project = req.body;
     db.run("INSERT INTO projects (name, description, version, repository, license) VALUES (?,?,?,?,?)",
       [project.name, project.description, project.version, project.repository, project.license],
       function(err) {
@@ -101,20 +95,8 @@ function read(req, res, db) {
  */
 function update(req, res, db) {
   var id = req.params.id;
-  var body = "";
-
-  req.on("error", function(err){
-    console.error(err);
-    res.statusCode = 500;
-    res.end("Server error");
-  });
-
-  req.on("data", function(data){
-    body += data;
-  });
-
-  req.on("end", function() {
-    var project = JSON.parse(body);
+  urlencoded(req, res, (req, res) => {
+    var project = req.body;
     db.run("UPDATE projects SET name=?, description=?, version=?, repository=?, license=? WHERE id=?",
       [project.name, project.description, project.version, project.repository, project.license, id],
       function(err) {
@@ -133,7 +115,7 @@ function update(req, res, db) {
 
 /** @destroy
  * Removes the specified project from the database.
- * @param {http.incomingRequest} req - the request object 
+ * @param {http.incomingRequest} req - the request object
  * @param {http.serverResponse} res - the response object
  * @param {sqlite3.Database} db - the database object
  */

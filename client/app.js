@@ -1,7 +1,19 @@
 /* Main entry point */
 
-var project = require('./project');
+var scrumtastic = {}
 
-$.get('/projects', function(projects){
-  $('body').html(project.list(projects));
+/* Add functionality to the library */
+require('./project')(scrumtastic);
+
+scrumtastic.listProjects();
+
+/* Apply menu controls */
+$('.navbar-brand').on('click', (event) => {
+  event.preventDefault();
+  scrumtastic.listProjects();
+});
+
+$('#projects-link').on('click', (event) => {
+  event.preventDefault();
+  scrumtastic.listProjects();
 });
